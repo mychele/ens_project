@@ -1,0 +1,82 @@
+% ENS homework
+
+% First thing: import audio file, play it, time plot
+
+clear all;
+close all;
+clc;
+
+[y, Fs] = audioread('segnale_107.wav');
+
+%*********************************************************************
+% frequency analysis
+
+Y = fft(y);
+f = Fs*linspace(0, 1, length(Y));
+
+figure(3)
+plot(f/1000, 20*log10(abs(Y)));
+title('DFT, module (dB)');
+xlabel('f [kHz]');
+ylabel('|Y| [dB]');
+
+figure(4)
+plot(f/1000, angle(Y));
+title('DFT, phase');
+xlabel('f [kHz]');
+ylabel('phase(Y)');
+
+
+% show the frequencies of the sin noise
+
+mean_y = mean(abs(Y));
+threshold = 3*max(abs(Y))/mean_y;
+ 
+[pks,locs] = findpeaks(abs(Y), 'THRESHOLD', threshold);
+
+figure(5)
+plot(f/1000, 20*log10(abs(Y))); hold on
+title('DFT, module (dB)');
+xlabel('f [kHz]');
+ylabel('|Y| [dB]');
+plot(f(locs)/1000,20*log10(pks+0.05),'k^','markerfacecolor',[1 0 0]), hold off
+
+%find repetead values
+
+freqs = ones(4, 1);
+r = 1;
+
+first_half = f(locs);
+second_half = Fs - f(locs)
+disp(f(locs))
+disp(Fs - f(locs))
+
+for i = 1:length(locs)
+    t = length(locs);
+    while t > i
+        disp(f(locs(i)))
+        disp(Fs - f(locs(t)))
+       if f(locs(i)) == (Fs - f(locs(t)))
+           Disp('this is a sin');
+           freqs(r) = f(i);
+           r = r + 1;
+       end
+       t = t - 1;
+    end
+end
+
+figure
+plot(f, abs(Y)), hold on;
+plot(freqs/1000, abs(Y(freqs))+0.05,'k^','markerfacecolor',[1 0 0]), hold off;
+
+
+
+
+
+
+
+
+
+
+
+
