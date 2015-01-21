@@ -1,11 +1,11 @@
 classdef deleteSins < matlab.System & matlab.system.mixin.Propagates ...
         & matlab.system.mixin.CustomIcon
-    % deleteSins Questo System Object � usato per rilevare componenti sinusoidali
+    % deleteSins Questo System Object viene usato per rilevare componenti sinusoidali
     % in un segnale, con una procedura iterativa.
 
     properties (PositiveInteger, Nontunable)
         %Threshold
-        % Specifica una soglia: se max(segnale) > threshold c'� un seno
+        % Specifica la soglia per rilevare la presenza di seni
         Threshold = 200
 
         %SampleRate
@@ -31,7 +31,7 @@ classdef deleteSins < matlab.System & matlab.system.mixin.Propagates ...
     end
 
     properties (DiscreteState)
-        % Stato dell'oggetto, sar� inizializzato in seguito
+        % Stato dell'oggetto, viene inizializzato in seguito
         State;
     end
 
@@ -57,7 +57,7 @@ classdef deleteSins < matlab.System & matlab.system.mixin.Propagates ...
             obj.r=1-delta;
         end
 
-        function [out, nSins] = stepImpl(obj,x)
+        function [out, nSins, amp_freq] = stepImpl(obj,x)
             % Funzione che viene eseguita ad ogni iterazione. Riconosce le
             % componenti sinusoidali e le filtra.
 
@@ -66,13 +66,25 @@ classdef deleteSins < matlab.System & matlab.system.mixin.Propagates ...
             X = fft(x, obj.NFFT);
             Y = fft(y, obj.NFFT);
 
+            % vettore in cui saranno salvate frequenza (prima riga) e
+            % ampiezze (seconda riga)
+            amp_freq = zeros(2, 3);
+            % scala il vettore delle frequenze a valori superiori a Fs, in
+            % questo modo quando si va a riordinare la matrice il seno di
+            % frequenza inferiore sarà sempre il primo
+            amp_freq(1, :) = obj.Fs + 1;
+
             % Calcola il massimo dello spettro del segnale
             [R, index] = max(abs(Y(1:length(Y)/2)));
             obj.numbSins = 0;
             while(R > obj.Threshold) % se supera la soglia data
                 % trova la frequenza corrispondente
                 fm = obj.f(index);
+
                 obj.numbSins = obj.numbSins + 1;
+                amp_freq(1, obj.numbSins) = fm; % si considera per il valore del massimo
+                                                % il segnale non finestrato
+                amp_freq(2, obj.numbSins) = (abs(X(index))*2/(obj.SamplesPerFrame));
 
                 % calcola i parametri del filtro notch
                 b1 = -2*cos(2*pi*fm/obj.Fs);
@@ -99,6 +111,12 @@ classdef deleteSins < matlab.System & matlab.system.mixin.Propagates ...
             obj.State = out_compl(length(x) + 1:2*length(x));
             % e ritorna il numero di seni trovati
             nSins = obj.numbSins;
+
+            % riordina la matrice amp_freq secondo la riga delle frequenze
+            [~,I]=sort(amp_freq(1,:));
+            amp_freq=amp_freq(:,I);
+            % elimina i valori non validi
+            amp_freq(amp_freq == obj.Fs + 1) = nan;
         end
 
         function resetImpl(obj)

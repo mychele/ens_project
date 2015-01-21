@@ -1,3 +1,5 @@
+% Main
+
 % Questo codice acquisisce, elabora riproduce un file .wav in tempo reale.
 
 % Inizializzazione
@@ -25,11 +27,11 @@ iterativeSinsDel = deleteSins('Threshold', 120, 'Fs', Fs, 'SamplesPerFrame', Fra
 
 % Vettore che registra il numero di componenti sinusoidali presenti
 % contemporanemente
-sinStartTimes = ones(1, Fs/FrameSize); % Fs/FrameSize è il numero massimo di iterazioni
+sinStartTimes = ones(1, Fs/FrameSize); % Fs/FrameSize ï¿½ il numero massimo di iterazioni
 % indice
 count = 1;
-
-
+% matrici per frequenze e ampiezze
+ampl_freqs = zeros(3, 10*Fs/FrameSize, 2);
 
 while ~isDone(AR)
     % acquisizione di FrameSize campioni del segnale
@@ -37,22 +39,22 @@ while ~isDone(AR)
     % filtraggio
     [audioOut, nSins, amps] = step(iterativeSinsDel, audioIn);
     sinStartTimes(count) = nSins;
+    ampl_freqs(:, count, 1) = amps(1, :);
+    ampl_freqs(:, count, 2) = amps(2, :);
     % salva su file
-    
     %step(toFile, audioOut);
     % riproduzione
     %step(AP, audioOut);
-    
+
     count = count + 1;
 end
 
-disp(amps);
+% stampa frequenze e ampiezze dei seni. Si stampano i massimi per evitare di
+% rappresentare le ampiezze del transitorio
+disp(max(ampl_freqs, [], 2));
 
 % rilascia le risorse
 release(AR);
 release(AP);
 %release(toFile);
 release(iterativeSinsDel);
-
-
-
