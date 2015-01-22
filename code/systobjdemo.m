@@ -7,7 +7,7 @@ close all;
 
 fileName = 'segnale_107.wav';
 saveTo = 'Polese_Michele.wav';
-% Numero di campioni che vengono acquisiti
+% Numero di campioni che vengono acquisiti ad ogni step
 FrameSize = 2000;
 % Inizializza l'oggetto che importa i campioni del file .wav
 AR = dsp.AudioFileReader('Filename', fileName, 'SamplesPerFrame', FrameSize);
