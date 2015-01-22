@@ -5,7 +5,7 @@
 
 \usepackage[margin=1.5in]{geometry}
 \usepackage[it]{subfigure}
-
+\usepackage{indentfirst}
 
 % il pacchetto inputenc permette l'inserimento diretto da tastiera
 % dei caratteri accentati
@@ -81,6 +81,7 @@ basicstyle=\footnotesize\ttfamily
 
 \begin{document}
 
+
   \title{Rimozione di rumore sinusoidale da un segnale audio}
   \subtitle{Progetto per il corso Elaborazione Numerica dei Segnali, 2014 - 2015}
   \author{Michele Polese, 1100877}
@@ -98,7 +99,7 @@ Calcolando la trasformata di Fourier su un segnale sinusoidale discreto di tipo 
   N_i(e^{j\theta}) = \frac{A_0}{2T}(\delta(\theta - \theta_i) + \delta(2 \pi - \theta_i - \theta))
 \end{equation}
 con $\theta_i = 2\pi f_i T$. \\
-Tuttavia per via della finestratura $z_i(nT) = n(nT)(\mathrm{u}(nT) - \mathrm{u}((n - n_0)T))$ che viene effettuata sul segnale (sia perché le componenti in analisi hanno una durata limitata, sia perché viene considerata solo una porzione del segnale per volta) si ha una convoluzione in frequenza. In particolar modo, data $w_r(nT) =  \mathrm{u}(nT) - \mathrm{u}((n - n_0)T)$ e la sua trasformata $W(e^{j\theta}) = /sinc(\theta) $ si ottiene che l'effettiva rappresentazione del segnale sinusoidale nel dominio della trasformata di Fourier è:
+Tuttavia per via della finestratura $z_i(nT) = n(nT)(\mathrm{u}(nT) - \mathrm{u}((n - n_0)T))$ che viene effettuata sul segnale (sia perché le componenti in analisi hanno una durata limitata, sia perché viene considerata solo una porzione del segnale per volta) si ha una convoluzione in frequenza. In particolar modo, data $w_r(nT) =  \mathrm{u}(nT) - \mathrm{u}((n - n_0)T)$ e la sua trasformata $W(e^{j\theta}) = e^{j\theta \frac{n_0}{2}} \sin(\theta (\frac{n_0}{2} + 1)) / \sin(\frac{\theta} { 2}) $ si ottiene che l'effettiva rappresentazione del segnale sinusoidale nel dominio della trasformata di Fourier è:
 \begin{equation}
   Z_i(e^{j\theta}) = W(e^{j\theta}) * N_i(e^{j\theta}) = \frac{A_0}{2T}(W(\theta - \theta_i) + W(2 \pi - \theta_i - \theta))
 \end{equation}
